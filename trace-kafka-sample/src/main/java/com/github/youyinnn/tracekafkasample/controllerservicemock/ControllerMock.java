@@ -43,6 +43,7 @@ public class ControllerMock implements ControllerInterface {
                 break;
             case 4:
                 producer.send("4");
+                break;
             case 5:
                 SpringApplication.exit(applicationContext, () -> 0);
                 break;
