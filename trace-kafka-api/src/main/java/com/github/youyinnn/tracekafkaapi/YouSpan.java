@@ -16,6 +16,7 @@ public class YouSpan implements Span {
     private final YouTracer tracer;
     private final long startTimeMilliseconds;
     private final Map<String, String> tags;
+    private final List<Reference> references;
 
     /**
      * span durationMicroseconds
@@ -34,17 +35,17 @@ public class YouSpan implements Span {
     protected YouSpan(YouTracer tracer,
                       long startTimeMilliseconds,
                       Map<String, String> tags,
-                      long durationMicroseconds,
                       String operationName,
-                      YouSpanContext context) {
+                      YouSpanContext context,
+                      List<Reference> references) {
 
         this.tracer = tracer;
         this.startTimeMilliseconds = startTimeMilliseconds;
-        this.durationMicroseconds = durationMicroseconds;
         this.operationName = operationName;
         this.tags = new ConcurrentHashMap<>(16);
         this.logs = new CopyOnWriteArrayList<>();
         this.context = context;
+        this.references = references != null ? new ArrayList<>(references) : null;
 
         this.tags.putAll(tags);
     }

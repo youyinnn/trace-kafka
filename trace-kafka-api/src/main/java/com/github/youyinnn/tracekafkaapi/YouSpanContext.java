@@ -1,8 +1,8 @@
 package com.github.youyinnn.tracekafkaapi;
 
-import com.github.youyinnn.tracekafkaapi.utils.YouObjectFactory;
 import io.opentracing.SpanContext;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -20,15 +20,15 @@ public class YouSpanContext implements SpanContext {
 
     public YouSpanContext(long traceIdLow,
                           long traceIdHigh,
-                          long spanId,
                           long parentId,
+                          long spanId,
                           Map<String, String> baggage,
                           YouObjectFactory objectFactory) {
 
         this.traceIdLow = traceIdLow;
         this.traceIdHigh = traceIdHigh;
-        this.spanId = spanId;
         this.parentId = parentId;
+        this.spanId = spanId;
         this.baggage = baggage;
         this.objectFactory = objectFactory;
     }
@@ -45,7 +45,7 @@ public class YouSpanContext implements SpanContext {
 
     @Override
     public Iterable<Map.Entry<String, String>> baggageItems() {
-        return null;
+        return new HashMap<>(baggage).entrySet();
     }
 
     public String getBaggageItem(String key) {
@@ -56,4 +56,11 @@ public class YouSpanContext implements SpanContext {
         baggage.put(key, value);
     }
 
+    public String getContextKey() {
+        return traceIdHigh + "-" + traceIdLow + "-" + parentId + "-" + spanId;
+    }
+
+    boolean hasTrace() {
+        return (traceIdLow != 0 || traceIdHigh != 0) && spanId != 0;
+    }
 }
