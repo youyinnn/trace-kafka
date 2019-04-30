@@ -63,4 +63,28 @@ public class YouSpanContext implements SpanContext {
     boolean hasTrace() {
         return (traceIdLow != 0 || traceIdHigh != 0) && spanId != 0;
     }
+
+    public Map<String, String> baggage() {
+        return baggage;
+    }
+
+    public long getTraceIdLow() {
+        return traceIdLow;
+    }
+
+    public long getTraceIdHigh() {
+        return traceIdHigh;
+    }
+
+    public long getSpanId() {
+        return spanId;
+    }
+
+    public long getParentId() {
+        return parentId;
+    }
+
+    public YouObjectFactory getObjectFactory() {
+        return objectFactory;
+    }
 }

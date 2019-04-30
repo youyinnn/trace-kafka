@@ -53,4 +53,8 @@ public class YouObjectFactory {
                 this);
     }
 
+    public YouTracer.SpanBuilder createSpanBuilder(YouTracer tracer, String operationName) {
+        return tracer.new SpanBuilder(operationName);
+    }
+
 }

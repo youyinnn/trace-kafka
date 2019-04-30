@@ -22,9 +22,9 @@ public class YouSpan implements Span {
      * span durationMicroseconds
      */
     private long durationMicroseconds;
+
     private String operationName;
     private YouSpanContext context;
-
     private List<LogData> logs;
 
     /**
@@ -52,6 +52,14 @@ public class YouSpan implements Span {
 
     public YouTracer getTracer() {
         return tracer;
+    }
+
+    public List<Reference> getReferences() {
+        return references;
+    }
+
+    public YouSpanContext getContext() {
+        return context;
     }
 
     public long getStartTimeMilliseconds() {

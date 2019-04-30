@@ -1,7 +1,12 @@
 package com.github.youyinnn.tracekafkaapi;
 
+import com.github.youyinnn.tracekafkaapi.propagation.Extractor;
+import com.github.youyinnn.tracekafkaapi.propagation.Injector;
+import com.github.youyinnn.tracekafkaapi.propagation.PropagationRegistry;
 import com.github.youyinnn.tracekafkaapi.reporter.Reporter;
+import com.github.youyinnn.tracekafkaapi.utils.IdGenerator;
 import com.github.youyinnn.tracekafkaapi.utils.SystemClock;
+import io.jaegertracing.internal.exceptions.UnsupportedFormatException;
 import io.opentracing.*;
 import io.opentracing.propagation.Format;
 import io.opentracing.tag.Tag;
@@ -24,11 +29,13 @@ public class YouTracer implements Tracer, Closeable {
     private final SystemClock clock;
     private final ScopeManager scopeManager;
     private final YouObjectFactory objectFactory;
+    private final PropagationRegistry propagationRegistry;
 
     protected YouTracer(YouTracer.Builder builder) {
         this.serviceName = builder.serviceName;
         this.reporter = builder.reporter;
         this.tags = new ConcurrentHashMap<>();
+        this.propagationRegistry = builder.propagationRegistry;
         tags.putAll(builder.tags);
         this.clock = builder.clock;
         this.scopeManager = builder.scopeManager;
@@ -37,6 +44,26 @@ public class YouTracer implements Tracer, Closeable {
         if (!builder.manualShutdown) {
             Runtime.getRuntime().addShutdownHook(new Thread(YouTracer.this::close));
         }
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public Reporter getReporter() {
+        return reporter;
+    }
+
+    void reportSpan(YouSpan span) {
+        reporter.report(span);
+    }
+
+    public Map<String, String> getTags() {
+        return tags;
+    }
+
+    public ScopeManager getScopeManager() {
+        return scopeManager;
     }
 
     @Override
@@ -56,22 +83,30 @@ public class YouTracer implements Tracer, Closeable {
 
     @Override
     public SpanBuilder buildSpan(String operationName) {
-        return null;
+        return objectFactory.createSpanBuilder(this, operationName);
     }
 
     @Override
     public <C> void inject(SpanContext spanContext, Format<C> format, C carrier) {
-
+        Injector<C> injector = propagationRegistry.getInjector(format);
+        if (injector == null) {
+            throw new UnsupportedFormatException(format);
+        }
+        injector.inject((YouSpanContext) spanContext, carrier);
     }
 
     @Override
-    public <C> SpanContext extract(Format<C> format, C carrier) {
-        return null;
+    public <C> YouSpanContext extract(Format<C> format, C carrier) {
+        Extractor<C> extractor = propagationRegistry.getExtractor(format);
+        if (extractor == null) {
+            throw new UnsupportedFormatException(format);
+        }
+        return extractor.extract(carrier);
     }
 
     @Override
     public void close() {
-
+        reporter.close();
     }
 
     public static class Builder {
@@ -82,6 +117,7 @@ public class YouTracer implements Tracer, Closeable {
         private ScopeManager scopeManager = new ThreadLocalScopeManager();
         private YouObjectFactory objectFactory = YouObjectFactory.getInstance();
         private boolean manualShutdown;
+        private final PropagationRegistry propagationRegistry = new PropagationRegistry();
 
         public Builder(String serviceName) {
             this.serviceName = serviceName;
@@ -128,6 +164,16 @@ public class YouTracer implements Tracer, Closeable {
 
         protected YouTracer createTracer() {
             return new YouTracer(this);
+        }
+
+        public <T> Builder registerInjector(Format<T> format, Injector<T> injector) {
+            this.propagationRegistry.register(format, injector);
+            return this;
+        }
+
+        public <T> Builder registerExtractor(Format<T> format, Extractor<T> extractor) {
+            this.propagationRegistry.register(format, extractor);
+            return this;
         }
     }
 
@@ -223,7 +269,7 @@ public class YouTracer implements Tracer, Closeable {
 
         @Override
         public YouSpan startManual() {
-            return null;
+            return start();
         }
 
         @Override
@@ -256,17 +302,62 @@ public class YouTracer implements Tracer, Closeable {
         }
 
         private YouSpanContext createChildContext() {
-            return null;
+            YouSpanContext preferredReference = preferredReference();
+
+            return objectFactory.createContext(
+                    preferredReference.getTraceIdHigh(),
+                    preferredReference.getTraceIdLow(),
+                    preferredReference.getSpanId(),
+                    IdGenerator.uniqueId(),
+                    preferredReference.baggage());
         }
 
         private YouSpanContext createNewContext() {
-            return null;
+
+            return objectFactory.createContext(
+                    IdGenerator.uniqueId(),
+                    IdGenerator.uniqueId(),
+                    0,
+                    IdGenerator.uniqueId(),
+                    getBaggage());
+        }
+
+        private Map<String, String> getBaggage() {
+            Map<String, String> baggage = null;
+
+            // optimization for 99% use cases, when there is only one parent
+            if (references.size() == 1) {
+                return references.get(0).getSpanContext().baggage();
+            }
+
+            for (Reference reference: references) {
+                if (reference.getSpanContext().baggage() != null) {
+                    if (baggage == null) {
+                        baggage = new HashMap<>();
+                    }
+                    baggage.putAll(reference.getSpanContext().baggage());
+                }
+            }
+
+            return baggage;
+        }
+
+        private YouSpanContext preferredReference() {
+            Reference preferredReference = references.get(0);
+            for (Reference reference: references) {
+                // childOf takes precedence as a preferred parent
+                if (References.CHILD_OF.equals(reference.getType())
+                        && !References.CHILD_OF.equals(preferredReference.getType())) {
+                    preferredReference = reference;
+                    break;
+                }
+            }
+            return preferredReference.getSpanContext();
         }
 
         @Override
         public Scope startActive(boolean finishSpanOnClose) {
-            return null;
+            return scopeManager.activate(start(), finishSpanOnClose);
         }
-
     }
 }
