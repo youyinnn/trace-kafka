@@ -19,9 +19,9 @@ public class YouSpan implements Span {
     private final List<Reference> references;
 
     /**
-     * span durationMicroseconds
+     * span durationMilliseconds
      */
-    private long durationMicroseconds;
+    private long durationMilliseconds;
 
     private String operationName;
     private YouSpanContext context;
@@ -30,7 +30,7 @@ public class YouSpan implements Span {
     /**
      * to prevent the same span from getting reported multiple times
      */
-    private boolean finished = false;
+    private volatile boolean finished = false;
 
     protected YouSpan(YouTracer tracer,
                       long startTimeMilliseconds,
@@ -71,8 +71,8 @@ public class YouSpan implements Span {
                 .unmodifiableMap(new HashMap<>(tags));
     }
 
-    public long getDurationMicroseconds() {
-        return durationMicroseconds;
+    public long getDurationMilliseconds() {
+        return durationMilliseconds;
     }
 
     public String getOperationName() {
@@ -118,22 +118,35 @@ public class YouSpan implements Span {
 
     @Override
     public YouSpan log(Map<String, ?> fields) {
-        return this;
+        return log(tracer.clock().currentTimeMillis(), fields);
     }
 
     @Override
-    public YouSpan log(long timestampMicroseconds, Map<String, ?> fields) {
-        return this;
+    public YouSpan log(long timestampMilliseconds, Map<String, ?> fields) {
+        return log(timestampMilliseconds, null, fields);
     }
 
     @Override
     public YouSpan log(String event) {
-        return this;
+        return log(tracer.clock().currentTimeMillis(), event);
     }
 
     @Override
-    public YouSpan log(long timestampMicroseconds, String event) {
-        return this;
+    public YouSpan log(long timestampMilliseconds, String event) {
+        return log(timestampMilliseconds, event, null);
+    }
+
+    private YouSpan log(long timestampMilliseconds, String event, Map<String, ?> fields) {
+        if (fields == null && event == null) {
+            return this;
+        }
+        synchronized (this) {
+            if (logs == null) {
+                this.logs = new ArrayList<>();
+            }
+            logs.add(new LogData(timestampMilliseconds, event, fields));
+            return this;
+        }
     }
 
     @Override
@@ -161,11 +174,24 @@ public class YouSpan implements Span {
 
     @Override
     public void finish() {
-
+        finish(tracer.clock().currentTimeMillis());
     }
 
     @Override
-    public void finish(long finishMicros) {
+    public void finish(long finishMilli) {
+        finishWithDuration(finishMilli - startTimeMilliseconds);
+    }
 
+    private void finishWithDuration(long durationMilliseconds) {
+        synchronized (this) {
+            if (finished) {
+                return;
+            }
+
+            finished = true;
+            this.durationMilliseconds = durationMilliseconds;
+        }
+
+        tracer.reportSpan(this);
     }
 }

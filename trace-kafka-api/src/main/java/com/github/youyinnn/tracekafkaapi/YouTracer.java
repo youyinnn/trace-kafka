@@ -31,7 +31,7 @@ public class YouTracer implements Tracer, Closeable {
     private final YouObjectFactory objectFactory;
     private final PropagationRegistry propagationRegistry;
 
-    protected YouTracer(YouTracer.Builder builder) {
+    private YouTracer(YouTracer.Builder builder) {
         this.serviceName = builder.serviceName;
         this.reporter = builder.reporter;
         this.tags = new ConcurrentHashMap<>();
@@ -46,6 +46,10 @@ public class YouTracer implements Tracer, Closeable {
         }
     }
 
+    public SystemClock clock() {
+        return clock;
+    }
+
     public String getServiceName() {
         return serviceName;
     }
@@ -55,7 +59,9 @@ public class YouTracer implements Tracer, Closeable {
     }
 
     void reportSpan(YouSpan span) {
-        reporter.report(span);
+        if (reporter != null) {
+            reporter.report(span);
+        }
     }
 
     public Map<String, String> getTags() {
@@ -180,7 +186,7 @@ public class YouTracer implements Tracer, Closeable {
     public class SpanBuilder implements Tracer.SpanBuilder {
 
         private String operationName;
-        private long startTimeMicroseconds;
+        private long startTimeMilliseconds;
 
         /**
          * In 99% situations there is only one parent (childOf), so we do not want to allocate
@@ -262,8 +268,8 @@ public class YouTracer implements Tracer, Closeable {
         }
 
         @Override
-        public YouTracer.SpanBuilder withStartTimestamp(long microseconds) {
-            this.startTimeMicroseconds = microseconds;
+        public YouTracer.SpanBuilder withStartTimestamp(long milliseconds) {
+            this.startTimeMilliseconds = milliseconds;
             return this;
         }
 
@@ -288,14 +294,14 @@ public class YouTracer implements Tracer, Closeable {
                 context = createChildContext();
             }
 
-            if (startTimeMicroseconds == 0) {
-                startTimeMicroseconds = clock.currentTimeMicros();
+            if (startTimeMilliseconds == 0) {
+                startTimeMilliseconds = clock.currentTimeMillis();
             }
 
             return objectFactory.createSpan(
                     YouTracer.this,
                     operationName,
-                    startTimeMicroseconds,
+                    startTimeMilliseconds,
                     tags,
                     context,
                     references);

@@ -20,10 +20,6 @@ public class SystemClock {
         return System.currentTimeMillis();
     }
 
-    public long currentTimeMicros() {
-        return System.currentTimeMillis() * 1000;
-    }
-
     public long currentTimeNanos() {
         return System.nanoTime();
     }

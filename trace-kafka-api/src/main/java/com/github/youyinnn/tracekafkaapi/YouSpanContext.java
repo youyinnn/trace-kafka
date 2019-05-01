@@ -84,6 +84,10 @@ public class YouSpanContext implements SpanContext {
         return parentId;
     }
 
+    public String getTraceId() {
+        return String.valueOf(traceIdHigh) + traceIdLow;
+    }
+
     public YouObjectFactory getObjectFactory() {
         return objectFactory;
     }
