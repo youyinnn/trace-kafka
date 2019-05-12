@@ -1,6 +1,6 @@
 package com.github.youyinnn.tracekafkaapi.propagation;
 
-import com.github.youyinnn.tracekafkaapi.YouSpanContext;
+import com.github.youyinnn.tracekafkaapi.api.YouSpanContext;
 import io.opentracing.propagation.Format;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

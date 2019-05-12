@@ -1,4 +1,4 @@
-package com.github.youyinnn.tracekafkaapi;
+package com.github.youyinnn.tracekafkaapi.api;
 
 import io.opentracing.Span;
 import io.opentracing.tag.Tag;

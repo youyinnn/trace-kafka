@@ -1,8 +1,8 @@
 package com.github.youyinnn.tracekafkaapi.codec;
 
-import com.github.youyinnn.tracekafkaapi.Constants;
-import com.github.youyinnn.tracekafkaapi.YouObjectFactory;
-import com.github.youyinnn.tracekafkaapi.YouSpanContext;
+import com.github.youyinnn.tracekafkaapi.api.Constants;
+import com.github.youyinnn.tracekafkaapi.api.YouObjectFactory;
+import com.github.youyinnn.tracekafkaapi.api.YouSpanContext;
 import io.opentracing.propagation.TextMap;
 
 import java.io.UnsupportedEncodingException;

@@ -1,10 +1,10 @@
-package com.github.youyinnn.tracekafkaapi;
+package com.github.youyinnn.tracekafkaapi.api;
 
 import com.github.youyinnn.tracekafkaapi.propagation.Extractor;
 import com.github.youyinnn.tracekafkaapi.propagation.Injector;
 import com.github.youyinnn.tracekafkaapi.propagation.PropagationRegistry;
 import com.github.youyinnn.tracekafkaapi.reporter.Reporter;
-import com.github.youyinnn.tracekafkaapi.utils.IdGenerator;
+import com.github.youyinnn.tracekafkaapi.utils.CodecStringUtil;
 import com.github.youyinnn.tracekafkaapi.utils.SystemClock;
 import io.jaegertracing.internal.exceptions.UnsupportedFormatException;
 import io.opentracing.*;
@@ -314,17 +314,17 @@ public class YouTracer implements Tracer, Closeable {
                     preferredReference.getTraceIdHigh(),
                     preferredReference.getTraceIdLow(),
                     preferredReference.getSpanId(),
-                    IdGenerator.uniqueId(),
+                    CodecStringUtil.uniqueId(),
                     preferredReference.baggage());
         }
 
         private YouSpanContext createNewContext() {
 
             return objectFactory.createContext(
-                    IdGenerator.uniqueId(),
-                    IdGenerator.uniqueId(),
+                    CodecStringUtil.uniqueId(),
+                    CodecStringUtil.uniqueId(),
                     0,
-                    IdGenerator.uniqueId(),
+                    CodecStringUtil.uniqueId(),
                     getBaggage());
         }
 

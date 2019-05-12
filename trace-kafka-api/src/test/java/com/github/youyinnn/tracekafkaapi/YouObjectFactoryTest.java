@@ -1,5 +1,6 @@
 package com.github.youyinnn.tracekafkaapi;
 
+import com.github.youyinnn.tracekafkaapi.api.YouObjectFactory;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

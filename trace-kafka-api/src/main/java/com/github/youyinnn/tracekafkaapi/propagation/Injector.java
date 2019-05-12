@@ -1,6 +1,6 @@
 package com.github.youyinnn.tracekafkaapi.propagation;
 
-import com.github.youyinnn.tracekafkaapi.YouSpanContext;
+import com.github.youyinnn.tracekafkaapi.api.YouSpanContext;
 
 /**
  * @author youyinnn

@@ -1,6 +1,6 @@
 package com.github.youyinnn.tracekafkaapi.reporter;
 
-import com.github.youyinnn.tracekafkaapi.YouSpan;
+import com.github.youyinnn.tracekafkaapi.api.YouSpan;
 
 public interface Reporter {
 
