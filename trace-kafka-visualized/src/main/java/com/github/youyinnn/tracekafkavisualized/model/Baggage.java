@@ -15,32 +15,36 @@ public class Baggage {
         return baggageId;
     }
 
-    public void setBaggageId(String baggageId) {
+    public Baggage setBaggageId(String baggageId) {
         this.baggageId = baggageId;
+        return this;
     }
 
     public String getSpanContextId() {
         return spanContextId;
     }
 
-    public void setSpanContextId(String spanContextId) {
+    public Baggage setSpanContextId(String spanContextId) {
         this.spanContextId = spanContextId;
+        return this;
     }
 
     public String getKey() {
         return key;
     }
 
-    public void setKey(String key) {
+    public Baggage setKey(String key) {
         this.key = key;
+        return this;
     }
 
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public Baggage setValue(String value) {
         this.value = value;
+        return this;
     }
 
     @Override

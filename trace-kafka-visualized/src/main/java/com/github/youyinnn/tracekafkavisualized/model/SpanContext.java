@@ -15,32 +15,36 @@ public class SpanContext {
         return spanContextId;
     }
 
-    public void setSpanContextId(String spanContextId) {
+    public SpanContext setSpanContextId(String spanContextId) {
         this.spanContextId = spanContextId;
+        return this;
     }
 
     public String getSpanId() {
         return spanId;
     }
 
-    public void setSpanId(String spanId) {
+    public SpanContext setSpanId(String spanId) {
         this.spanId = spanId;
+        return this;
     }
 
     public String getTraceId() {
         return traceId;
     }
 
-    public void setTraceId(String traceId) {
+    public SpanContext setTraceId(String traceId) {
         this.traceId = traceId;
+        return this;
     }
 
     public String getReferenceJson() {
         return referenceJson;
     }
 
-    public void setReferenceJson(String referenceJson) {
+    public SpanContext setReferenceJson(String referenceJson) {
         this.referenceJson = referenceJson;
+        return this;
     }
 
     @Override

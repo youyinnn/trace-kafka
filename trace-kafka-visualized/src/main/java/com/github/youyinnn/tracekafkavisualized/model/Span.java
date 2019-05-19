@@ -17,48 +17,54 @@ public class Span {
         return spanId;
     }
 
-    public void setSpanId(String spanId) {
+    public Span setSpanId(String spanId) {
         this.spanId = spanId;
+        return this;
     }
 
     public String getOperationName() {
         return operationName;
     }
 
-    public void setOperationName(String operationName) {
+    public Span setOperationName(String operationName) {
         this.operationName = operationName;
+        return this;
     }
 
     public String getTraceId() {
         return traceId;
     }
 
-    public void setTraceId(String traceId) {
+    public Span setTraceId(String traceId) {
         this.traceId = traceId;
+        return this;
     }
 
     public long getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(long startTime) {
+    public Span setStartTime(long startTime) {
         this.startTime = startTime;
+        return this;
     }
 
     public long getFinishTime() {
         return finishTime;
     }
 
-    public void setFinishTime(long finishTime) {
+    public Span setFinishTime(long finishTime) {
         this.finishTime = finishTime;
+        return this;
     }
 
     public String getTagKeyValueJson() {
         return tagKeyValueJson;
     }
 
-    public void setTagKeyValueJson(String tagKeyValueJson) {
+    public Span setTagKeyValueJson(String tagKeyValueJson) {
         this.tagKeyValueJson = tagKeyValueJson;
+        return this;
     }
 
     @Override

@@ -15,32 +15,36 @@ public class Log {
         return logId;
     }
 
-    public void setLogId(String logId) {
+    public Log setLogId(String logId) {
         this.logId = logId;
+        return this;
     }
 
     public String getSpanId() {
         return spanId;
     }
 
-    public void setSpanId(String spanId) {
+    public Log setSpanId(String spanId) {
         this.spanId = spanId;
+        return this;
     }
 
     public String getKey() {
         return key;
     }
 
-    public void setKey(String key) {
+    public Log setKey(String key) {
         this.key = key;
+        return this;
     }
 
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public Log setValue(String value) {
         this.value = value;
+        return this;
     }
 
     @Override
