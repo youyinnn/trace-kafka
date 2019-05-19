@@ -17,7 +17,23 @@ public class TraceDao extends YouDao<Trace> {
         return modelHandler.saveModel(trace);
     }
 
+    public Trace getTraceByTraceId(String traceId) {
+        return modelHandler.getModel(
+                YouCollectionsUtils.getYouHashMap("traceId", traceId),
+                YouCollectionsUtils.getYouArrayList("traceId", "serviceName"),
+                "AND"
+        );
+    }
+
     public List<Trace> getTraces() {
         return modelHandler.getListForAll(YouCollectionsUtils.getYouArrayList("traceId", "serviceName"));
+    }
+
+    public List<Trace> getTracesByServiceNameInFuzzy(String serviceName) {
+        return modelHandler.getListWhereLike(
+                YouCollectionsUtils.getYouHashMap("serviceName", serviceName),
+                YouCollectionsUtils.getYouArrayList("traceId", "serviceName"),
+                "AND"
+        );
     }
 }
