@@ -17,10 +17,6 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class CodecStringUtil {
 
-    public static long uniqueId() {
-        return ThreadLocalRandom.current().nextLong();
-    }
-
     private static String keyOne;
     private static String keyTwo;
 

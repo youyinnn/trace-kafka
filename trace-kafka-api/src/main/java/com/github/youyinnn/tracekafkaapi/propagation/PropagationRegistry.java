@@ -1,6 +1,7 @@
 package com.github.youyinnn.tracekafkaapi.propagation;
 
 import com.github.youyinnn.tracekafkaapi.api.YouSpanContext;
+import com.github.youyinnn.tracekafkaapi.codec.Codec;
 import io.opentracing.propagation.Format;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +31,16 @@ public class PropagationRegistry {
     }
 
     public <T> void register(Format<T> format, Injector<T> injector) {
-        injectors.put(format, new ExceptionCatchingInjectorDecorator<T>(injector));
+        injectors.put(format, new ExceptionCatchingInjectorDecorator<>(injector));
     }
 
     public <T> void register(Format<T> format, Extractor<T> extractor) {
-        extractors.put(format, new ExceptionCatchingExtractorDecorator<T>(extractor));
+        extractors.put(format, new ExceptionCatchingExtractorDecorator<>(extractor));
+    }
+
+    public <T> void register(Format<T> format, Codec<T> codec) {
+        injectors.put(format, new ExceptionCatchingInjectorDecorator<>(codec));
+        extractors.put(format, new ExceptionCatchingExtractorDecorator<>(codec));
     }
 
     private static class ExceptionCatchingExtractorDecorator<T> implements Extractor<T> {

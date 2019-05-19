@@ -1,6 +1,7 @@
 package com.github.youyinnn.tracekafkaapi.api;
 
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * @author youyinnn
@@ -28,5 +29,14 @@ public class LogData {
 
     public Map<String, ?> getFields() {
         return fields;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", LogData.class.getSimpleName() + "[", "]")
+                .add("time=" + time)
+                .add("message='" + message + "'")
+                .add("fields=" + fields)
+                .toString();
     }
 }

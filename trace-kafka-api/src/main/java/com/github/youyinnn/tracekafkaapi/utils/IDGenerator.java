@@ -1,4 +1,4 @@
-package com.github.youyinnn.tracekafkavisualized.util;
+package com.github.youyinnn.tracekafkaapi.utils;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
@@ -16,7 +16,7 @@ public class IDGenerator {
     }
 
     public static String getID() {
-        return (System.nanoTime() + atomicLong.getAndIncrement()) + "-" + getUUID32();
+        return (System.nanoTime() + atomicLong.getAndIncrement()) + getUUID32();
     }
 
 }

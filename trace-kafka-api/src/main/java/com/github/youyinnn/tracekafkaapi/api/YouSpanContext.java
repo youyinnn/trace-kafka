@@ -4,6 +4,7 @@ import io.opentracing.SpanContext;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * @author youyinnn
@@ -11,22 +12,19 @@ import java.util.Map;
  */
 public class YouSpanContext implements SpanContext {
 
-    private final long traceIdLow;
-    private final long traceIdHigh;
-    private final long spanId;
-    private final long parentId;
+    private final String traceId;
+    private final String spanId;
+    private final String parentId;
     private final Map<String, String> baggage;
     private final YouObjectFactory objectFactory;
 
-    public YouSpanContext(long traceIdLow,
-                          long traceIdHigh,
-                          long parentId,
-                          long spanId,
+    public YouSpanContext(String traceId,
+                          String parentId,
+                          String spanId,
                           Map<String, String> baggage,
                           YouObjectFactory objectFactory) {
 
-        this.traceIdLow = traceIdLow;
-        this.traceIdHigh = traceIdHigh;
+        this.traceId = traceId;
         this.parentId = parentId;
         this.spanId = spanId;
         this.baggage = baggage;
@@ -35,12 +33,12 @@ public class YouSpanContext implements SpanContext {
 
     @Override
     public String toTraceId() {
-        return null;
+        return traceId;
     }
 
     @Override
     public String toSpanId() {
-        return null;
+        return spanId;
     }
 
     @Override
@@ -57,38 +55,37 @@ public class YouSpanContext implements SpanContext {
     }
 
     public String getContextKey() {
-        return traceIdHigh + "-" + traceIdLow + "-" + parentId + "-" + spanId;
-    }
-
-    boolean hasTrace() {
-        return (traceIdLow != 0 || traceIdHigh != 0) && spanId != 0;
+        return traceId + "-" + parentId + "-" + spanId;
     }
 
     public Map<String, String> baggage() {
         return baggage;
     }
 
-    public long getTraceIdLow() {
-        return traceIdLow;
-    }
-
-    public long getTraceIdHigh() {
-        return traceIdHigh;
-    }
-
-    public long getSpanId() {
+    public String getSpanId() {
         return spanId;
     }
 
-    public long getParentId() {
+    public String getParentId() {
         return parentId;
     }
 
     public String getTraceId() {
-        return String.valueOf(traceIdHigh) + traceIdLow;
+        return traceId;
     }
 
     public YouObjectFactory getObjectFactory() {
         return objectFactory;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", YouSpanContext.class.getSimpleName() + "[", "]")
+                .add("traceId='" + traceId + "'")
+                .add("spanId='" + spanId + "'")
+                .add("parentId='" + parentId + "'")
+                .add("baggage=" + baggage)
+                .add("objectFactory=" + objectFactory)
+                .toString();
     }
 }

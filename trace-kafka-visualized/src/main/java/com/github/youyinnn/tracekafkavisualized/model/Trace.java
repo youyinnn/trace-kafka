@@ -1,7 +1,5 @@
 package com.github.youyinnn.tracekafkavisualized.model;
 
-import com.github.youyinnn.tracekafkavisualized.util.IDGenerator;
-
 /**
  * @author youyinnn
  * Date 5/12/2019
@@ -14,9 +12,9 @@ public class Trace {
     public Trace() {
     }
 
-    public Trace(String serviceName) {
+    public Trace(String traceId,String serviceName) {
         this.serviceName = serviceName;
-        this.traceId = IDGenerator.getID();
+        this.traceId = traceId;
     }
 
     public String getTraceId() {

@@ -194,4 +194,19 @@ public class YouSpan implements Span {
 
         tracer.reportSpan(this);
     }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", YouSpan.class.getSimpleName() + "[", "]")
+                .add("tracer=" + tracer)
+                .add("startTimeMilliseconds=" + startTimeMilliseconds)
+                .add("tags=" + tags)
+                .add("references=" + references)
+                .add("durationMilliseconds=" + durationMilliseconds)
+                .add("operationName='" + operationName + "'")
+                .add("context=" + context)
+                .add("logs=" + logs)
+                .add("finished=" + finished)
+                .toString();
+    }
 }

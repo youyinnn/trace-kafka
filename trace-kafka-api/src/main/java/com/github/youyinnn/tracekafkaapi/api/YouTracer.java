@@ -1,10 +1,11 @@
 package com.github.youyinnn.tracekafkaapi.api;
 
+import com.github.youyinnn.tracekafkaapi.codec.Codec;
 import com.github.youyinnn.tracekafkaapi.propagation.Extractor;
 import com.github.youyinnn.tracekafkaapi.propagation.Injector;
 import com.github.youyinnn.tracekafkaapi.propagation.PropagationRegistry;
 import com.github.youyinnn.tracekafkaapi.reporter.Reporter;
-import com.github.youyinnn.tracekafkaapi.utils.CodecStringUtil;
+import com.github.youyinnn.tracekafkaapi.utils.IDGenerator;
 import com.github.youyinnn.tracekafkaapi.utils.SystemClock;
 import io.jaegertracing.internal.exceptions.UnsupportedFormatException;
 import io.opentracing.*;
@@ -12,31 +13,23 @@ import io.opentracing.propagation.Format;
 import io.opentracing.tag.Tag;
 import io.opentracing.util.ThreadLocalScopeManager;
 
-import java.io.Closeable;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author youyinnn
  * Date 4/25/2019
  */
-public class YouTracer implements Tracer, Closeable {
+public class YouTracer implements Tracer {
 
-    private final String serviceName;
     private Reporter reporter;
-    private final Map<String, String> tags;
-
     private final SystemClock clock;
     private final ScopeManager scopeManager;
     private final YouObjectFactory objectFactory;
     private final PropagationRegistry propagationRegistry;
 
     private YouTracer(YouTracer.Builder builder) {
-        this.serviceName = builder.serviceName;
         this.reporter = builder.reporter;
-        this.tags = new ConcurrentHashMap<>();
         this.propagationRegistry = builder.propagationRegistry;
-        tags.putAll(builder.tags);
         this.clock = builder.clock;
         this.scopeManager = builder.scopeManager;
         this.objectFactory = builder.objectFactory;
@@ -46,12 +39,8 @@ public class YouTracer implements Tracer, Closeable {
         }
     }
 
-    public SystemClock clock() {
+    SystemClock clock() {
         return clock;
-    }
-
-    public String getServiceName() {
-        return serviceName;
     }
 
     public Reporter getReporter() {
@@ -62,10 +51,6 @@ public class YouTracer implements Tracer, Closeable {
         if (reporter != null) {
             reporter.report(span);
         }
-    }
-
-    public Map<String, String> getTags() {
-        return tags;
     }
 
     public ScopeManager getScopeManager() {
@@ -115,19 +100,17 @@ public class YouTracer implements Tracer, Closeable {
         reporter.close();
     }
 
+    public static void setServiceName(Span span, String serviceName) {
+        span.setTag(Constants.SERVICE_NAME_KEY, serviceName);
+    }
+
     public static class Builder {
         private Reporter reporter;
-        private final String serviceName;
-        private Map<String, String> tags = new HashMap<>();
         private SystemClock clock = SystemClock.getInstance();
         private ScopeManager scopeManager = new ThreadLocalScopeManager();
         private YouObjectFactory objectFactory = YouObjectFactory.getInstance();
         private boolean manualShutdown;
         private final PropagationRegistry propagationRegistry = new PropagationRegistry();
-
-        public Builder(String serviceName) {
-            this.serviceName = serviceName;
-        }
 
         public Builder withReporter(Reporter reporter) {
             this.reporter = reporter;
@@ -136,28 +119,6 @@ public class YouTracer implements Tracer, Closeable {
 
         public Builder withManualShutdown() {
             this.manualShutdown = true;
-            return this;
-        }
-
-        public Builder withTag(String key, String value) {
-            tags.putIfAbsent(key, value);
-            return this;
-        }
-
-        public Builder withTag(String key, boolean value) {
-            tags.putIfAbsent(key, String.valueOf(value));
-            return this;
-        }
-
-        public Builder withTag(String key, Number value) {
-            tags.putIfAbsent(key, String.valueOf(value));
-            return this;
-        }
-
-        public Builder withTags(Map<String, String> tags) {
-            if (tags != null) {
-                this.tags.putAll(tags);
-            }
             return this;
         }
 
@@ -179,6 +140,11 @@ public class YouTracer implements Tracer, Closeable {
 
         public <T> Builder registerExtractor(Format<T> format, Extractor<T> extractor) {
             this.propagationRegistry.register(format, extractor);
+            return this;
+        }
+
+        public <T> Builder registerCodec(Format<T> format, Codec<T> codec) {
+            this.propagationRegistry.register(format, codec);
             return this;
         }
     }
@@ -234,7 +200,7 @@ public class YouTracer implements Tracer, Closeable {
                 references.add(new Reference(realReferenceContext, referenceType));
             }
 
-            return null;
+            return this;
         }
 
         @Override
@@ -287,8 +253,7 @@ public class YouTracer implements Tracer, Closeable {
                 asChildOf(scopeManager.activeSpan());
             }
 
-            if (references.isEmpty() ||
-                    !references.get(0).getSpanContext().hasTrace()) {
+            if (references.isEmpty()) {
                 context = createNewContext();
             } else {
                 context = createChildContext();
@@ -311,25 +276,27 @@ public class YouTracer implements Tracer, Closeable {
             YouSpanContext preferredReference = preferredReference();
 
             return objectFactory.createContext(
-                    preferredReference.getTraceIdHigh(),
-                    preferredReference.getTraceIdLow(),
+                    preferredReference.getTraceId(),
                     preferredReference.getSpanId(),
-                    CodecStringUtil.uniqueId(),
+                    IDGenerator.getID(),
                     preferredReference.baggage());
         }
 
         private YouSpanContext createNewContext() {
 
             return objectFactory.createContext(
-                    CodecStringUtil.uniqueId(),
-                    CodecStringUtil.uniqueId(),
-                    0,
-                    CodecStringUtil.uniqueId(),
+                    IDGenerator.getID(),
+                    "0",
+                    IDGenerator.getID(),
                     getBaggage());
         }
 
         private Map<String, String> getBaggage() {
             Map<String, String> baggage = null;
+
+            if (references.size() == 0) {
+                return new HashMap<>(16);
+            }
 
             // optimization for 99% use cases, when there is only one parent
             if (references.size() == 1) {
@@ -339,7 +306,7 @@ public class YouTracer implements Tracer, Closeable {
             for (Reference reference: references) {
                 if (reference.getSpanContext().baggage() != null) {
                     if (baggage == null) {
-                        baggage = new HashMap<>();
+                        baggage = new HashMap<>(16);
                     }
                     baggage.putAll(reference.getSpanContext().baggage());
                 }

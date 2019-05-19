@@ -22,10 +22,10 @@ public class TraceService {
         return traceDao.getTracesByServiceNameInFuzzy(serviceName);
     }
 
-    public int createTrace(String serviceName) {
+    public int createTrace(String traceId, String serviceName) {
         int flag = -1;
         try {
-            flag = traceDao.addTrace(new Trace(serviceName));
+            flag = traceDao.addTrace(new Trace(traceId, serviceName));
         } catch (NoneffectiveUpdateExecuteException e) {
             e.printStackTrace();
         }

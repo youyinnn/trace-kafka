@@ -38,15 +38,13 @@ public class YouObjectFactory {
     }
 
     public YouSpanContext createContext(
-            long traceIdHigh,
-            long traceIdLow,
-            long parentId,
-            long spanId,
+            String traceId,
+            String parentId,
+            String spanId,
             Map<String, String> baggage) {
 
         return new YouSpanContext(
-                traceIdLow,
-                traceIdHigh,
+                traceId,
                 parentId,
                 spanId,
                 baggage,

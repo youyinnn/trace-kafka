@@ -63,10 +63,9 @@ public class TextMapCodec implements Codec<TextMap>{
         }
         if (yspcId != null) {
             context =  objectFactory.createContext(
-                    Long.valueOf(yspcId[0]),
-                    Long.valueOf(yspcId[1]),
-                    Long.valueOf(yspcId[2]),
-                    Long.valueOf(yspcId[3]),
+                    yspcId[0],
+                    yspcId[1],
+                    yspcId[2],
                     baggage);
         }
         return context;
