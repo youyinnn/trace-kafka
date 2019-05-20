@@ -58,7 +58,7 @@ public class TextMapCodec implements Codec<TextMap>{
             if (key.equals(contextKey)) {
                 yspcId = entry.getValue().split("-");
             } else if (key.startsWith(baggagePrefix)) {
-                baggage.put(key.substring(baggagePrefix.length() - 1), decodedValue(entry.getValue()));
+                baggage.put(key.substring(baggagePrefix.length()), decodedValue(entry.getValue()));
             }
         }
         if (yspcId != null) {

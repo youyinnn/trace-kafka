@@ -16,6 +16,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -72,7 +75,7 @@ public class TraceKafkaApiApplicationTests {
         op1.log("event1");
         op1.setTag("tagk1", "tagv1");
         op1.setTag("tagk2", "tagv2");
-        op1.setBaggageItem("bgv1", "bvg2");
+        op1.setBaggageItem("bgk1", "bgv1");
         //ConsoleReporter.staticReport(op1);
         YouTracer.setServiceName(op1, "service1");
 
@@ -82,9 +85,11 @@ public class TraceKafkaApiApplicationTests {
 
         System.out.println(map);
         SpanContext extract = tracer.extract(Format.Builtin.TEXT_MAP, textMapAdapter);
-        System.out.println(extract.toTraceId());
-        System.out.println(extract.toSpanId());
-
+        assertEquals(op1.context().toTraceId(), extract.toTraceId());
+        assertEquals(op1.context().toSpanId(), extract.toSpanId());
+        for (Map.Entry<String, String> entry : extract.baggageItems()) {
+            System.out.println(entry);
+        }
     }
 
 }

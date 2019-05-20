@@ -1,5 +1,7 @@
 package com.github.youyinnn.tracekafkasample.controllerservicemock;
 
+import com.alibaba.fastjson.JSON;
+import com.github.youyinnn.tracekafkasample.model.KafkaMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +29,10 @@ class ControllerConsumer {
                                @Header(KafkaHeaders.RECEIVED_PARTITION_ID) List<Integer> partitions,
                                @Header(KafkaHeaders.RECEIVED_TOPIC) List<String> topics,
                                @Header(KafkaHeaders.OFFSET) List<Long> offsets) {
-        LOGGER.info("ControllerService receive message from orm: [ {} ]", message);
-        controller.requestHandler();
+        if (JSON.isValid(message)) {
+            LOGGER.info("ControllerService receive message from orm: [ {} ]", JSON.parseObject(message, KafkaMessage.class));
+            controller.requestHandler();
+        }
     }
 
 }

@@ -1,5 +1,7 @@
 package com.github.youyinnn.tracekafkasample.controllerservicemock;
 
+import com.alibaba.fastjson.JSON;
+import com.github.youyinnn.tracekafkasample.model.KafkaMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,8 +26,8 @@ public class ControllerProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void send(String message) {
-        this.kafkaTemplate.send(topic, message);
+    public void send(KafkaMessage message) {
+        this.kafkaTemplate.send(topic, JSON.toJSONString(message));
         LOGGER.info("ControllerService sent message [ {} ] to {}", message, topic);
     }
 

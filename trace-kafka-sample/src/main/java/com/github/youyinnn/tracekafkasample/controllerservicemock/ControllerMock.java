@@ -1,5 +1,6 @@
 package com.github.youyinnn.tracekafkasample.controllerservicemock;
 
+import com.github.youyinnn.tracekafkasample.model.KafkaMessage;
 import com.github.youyinnn.tracekafkasample.utils.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -33,16 +34,16 @@ public class ControllerMock implements ControllerInterface {
         RandomUtils.latencyMock(10);
         switch (s) {
             case 1:
-                producer.send("1");
+                producer.send(new KafkaMessage("1"));
                 break;
             case 2:
-                producer.send("2");
+                producer.send(new KafkaMessage("2"));
                 break;
             case 3:
-                producer.send("3");
+                producer.send(new KafkaMessage("3"));
                 break;
             case 4:
-                producer.send("4");
+                producer.send(new KafkaMessage("4"));
                 break;
             case 5:
                 SpringApplication.exit(applicationContext, () -> 0);
