@@ -1,17 +1,19 @@
 package com.github.youyinnn.tracekafkasample.ormservicemock;
 
+import io.opentracing.Span;
+
 /**
  * @author youyinnn
  * Date 4/22/2019
  */
 public interface OrmInterface {
 
-    int save();
+    int save(Span parent);
 
-    int update();
+    int update(Span parent);
 
-    String search();
+    String search(Span parent);
 
-    int delete();
+    int delete(Span parent);
 
 }

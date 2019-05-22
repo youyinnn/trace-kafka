@@ -3,6 +3,8 @@ package com.github.youyinnn.tracekafkasample.ormservicemock;
 import com.alibaba.fastjson.JSON;
 import com.github.youyinnn.tracekafkasample.controllerservicemock.ControllerProducer;
 import com.github.youyinnn.tracekafkasample.model.KafkaMessage;
+import io.opentracing.Span;
+import io.opentracing.util.GlobalTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,9 +29,15 @@ public class OrmProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void send(KafkaMessage message) {
+    public void send(KafkaMessage message, Span parent) {
+        Span send = GlobalTracer.get().buildSpan("o-send")
+                .asChildOf(parent)
+                .start();
         this.kafkaTemplate.send(topic, JSON.toJSONString(message));
+
+        send.log("o send msg:" + JSON.toJSONString(message));
         LOGGER.info("OrmService sent message [ {} ] to {}", message, topic);
+        send.finish();
     }
 
 }

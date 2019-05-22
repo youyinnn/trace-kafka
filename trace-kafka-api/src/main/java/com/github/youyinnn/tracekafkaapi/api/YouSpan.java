@@ -198,15 +198,13 @@ public class YouSpan implements Span {
     @Override
     public String toString() {
         return new StringJoiner(", ", YouSpan.class.getSimpleName() + "[", "]")
-                .add("tracer=" + tracer)
-                .add("startTimeMilliseconds=" + startTimeMilliseconds)
-                .add("tags=" + tags)
-                .add("references=" + references)
-                .add("durationMilliseconds=" + durationMilliseconds)
                 .add("operationName='" + operationName + "'")
+                .add("startTimeMilliseconds=" + new Date(startTimeMilliseconds))
+                .add("references=" + references)
+                .add("tracer=" + tracer)
                 .add("context=" + context)
+                .add("tags=" + tags)
                 .add("logs=" + logs)
-                .add("finished=" + finished)
                 .toString();
     }
 }

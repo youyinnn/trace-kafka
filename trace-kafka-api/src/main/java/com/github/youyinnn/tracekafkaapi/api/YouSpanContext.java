@@ -81,11 +81,10 @@ public class YouSpanContext implements SpanContext {
     @Override
     public String toString() {
         return new StringJoiner(", ", YouSpanContext.class.getSimpleName() + "[", "]")
-                .add("traceId='" + traceId + "'")
                 .add("spanId='" + spanId + "'")
                 .add("parentId='" + parentId + "'")
+                .add("traceId='" + traceId + "'")
                 .add("baggage=" + baggage)
-                .add("objectFactory=" + objectFactory)
                 .toString();
     }
 }

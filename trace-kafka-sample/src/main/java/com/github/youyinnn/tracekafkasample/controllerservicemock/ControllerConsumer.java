@@ -2,6 +2,12 @@ package com.github.youyinnn.tracekafkasample.controllerservicemock;
 
 import com.alibaba.fastjson.JSON;
 import com.github.youyinnn.tracekafkasample.model.KafkaMessage;
+import io.opentracing.Span;
+import io.opentracing.SpanContext;
+import io.opentracing.Tracer;
+import io.opentracing.propagation.Format;
+import io.opentracing.propagation.TextMapAdapter;
+import io.opentracing.util.GlobalTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +36,18 @@ class ControllerConsumer {
                                @Header(KafkaHeaders.RECEIVED_TOPIC) List<String> topics,
                                @Header(KafkaHeaders.OFFSET) List<Long> offsets) {
         if (JSON.isValid(message)) {
-            LOGGER.info("ControllerService receive message from orm: [ {} ]", JSON.parseObject(message, KafkaMessage.class));
+            Tracer tracer = GlobalTracer.get();
+            KafkaMessage kafkaMessage = JSON.parseObject(message, KafkaMessage.class);
+            SpanContext extract
+                    = tracer.extract(Format.Builtin.TEXT_MAP, new TextMapAdapter(kafkaMessage.getHeader()));
+            Span span = tracer.buildSpan("c-receive")
+                    .asChildOf(extract)
+                    .start();
+            LOGGER.info("ControllerService receive message from orm: [ {} ]", kafkaMessage);
+            span.log("c receive data: " + kafkaMessage);
+
             controller.requestHandler();
+            span.finish();
         }
     }
 
