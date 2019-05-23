@@ -1,6 +1,5 @@
 package com.github.youyinnn.tracekafkaapi.reporter;
 
-import com.github.youyinnn.tracekafkaapi.api.YouSpan;
 import io.opentracing.Span;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,7 @@ public class ConsoleReporter implements Reporter {
     }
 
     @Override
-    public void report(YouSpan span) {
+    public void report(Span span) {
         staticReport(span);
     }
 

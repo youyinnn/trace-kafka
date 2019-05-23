@@ -1,10 +1,10 @@
 package com.github.youyinnn.tracekafkaapi.reporter;
 
-import com.github.youyinnn.tracekafkaapi.api.YouSpan;
+import io.opentracing.Span;
 
 public interface Reporter {
 
-    void report(YouSpan span);
+    void report(Span span);
 
     void close();
 }

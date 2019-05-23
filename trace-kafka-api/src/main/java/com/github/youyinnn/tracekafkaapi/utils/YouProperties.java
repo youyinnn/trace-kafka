@@ -1,41 +1,52 @@
 package com.github.youyinnn.tracekafkaapi.utils;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * @author youyinnn
  * Date 5/12/2019
  */
-@Configuration
-//@PropertySource("classpath:my.properties")
-@ConfigurationProperties(prefix = "valid")
+@ConfigurationProperties(prefix = "tracer")
 public class YouProperties {
 
-    private String keyOne;
-    private String keyTwo;
+    private String validKeyOne;
+    private String validKeyTwo;
+    private String reportHttpHost;
+    private String reportHttpPort;
 
-    public String getKeyOne() {
-        return keyOne;
+    public String getValidKeyOne() {
+        return validKeyOne;
     }
 
-    public void setKeyOne(String keyOne) {
-        this.keyOne = keyOne;
+    public YouProperties setValidKeyOne(String validKeyOne) {
+        this.validKeyOne = validKeyOne;
+        return this;
     }
 
-    public String getKeyTwo() {
-        return keyTwo;
+    public String getValidKeyTwo() {
+        return validKeyTwo;
     }
 
-    public void setKeyTwo(String keyTwo) {
-        this.keyTwo = keyTwo;
+    public YouProperties setValidKeyTwo(String validKeyTwo) {
+        this.validKeyTwo = validKeyTwo;
+        return this;
     }
 
-    @Override
-    public String toString() {
-        return "YouProperties{" +
-                "keyOne='" + keyOne + '\'' +
-                ", keyTwo='" + keyTwo + '\'' +
-                '}';
+    public String getReportHttpHost() {
+        return reportHttpHost;
+    }
+
+    public YouProperties setReportHttpHost(String reportHttpHost) {
+        this.reportHttpHost = reportHttpHost;
+        return this;
+    }
+
+    public String getReportHttpPort() {
+        return reportHttpPort;
+    }
+
+    public YouProperties setReportHttpPort(String reportHttpPort) {
+        this.reportHttpPort = reportHttpPort;
+        return this;
     }
 }
